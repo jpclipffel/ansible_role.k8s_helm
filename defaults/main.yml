@@ -1,0 +1,9 @@
+# Helm version, distribution, package name and source URL
+k8s_helm_version: "3.0.3"
+k8s_helm_distribution: "linux-amd64"
+k8s_helm_package: "helm-v{{ k8s_helm_version }}-{{ k8s_helm_distribution }}.tar.gz"
+k8s_helm_package_url: "https://get.helm.sh/{{ k8s_helm_package }}"
+
+# Helm install and binary location
+k8s_helm_install_dir: /usr/local/sbin
+k8s_helm_bin: "{{ k8s_helm_install_dir }}/helm"

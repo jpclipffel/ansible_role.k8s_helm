@@ -1,0 +1,85 @@
+- name: Assertions
+  assert:
+    that:
+      - k8s_primary_master_name is defined
+      - k8s_node_type is defined
+  tags:
+    - setup
+    - remove
+
+
+- name: Check Helm installation status
+  stat:
+    path: "{{ k8s_helm_bin }}"
+  register: _k8s_helm_bin
+  when:
+    - k8s_node_type == "master"
+  tags:
+    - setup
+    - remove
+
+
+- name: Create Helm temporary installation directory
+  tempfile:
+    state: directory
+  register: _helm_unpack_dir
+  when:
+    - k8s_node_type == "master"
+    - not _k8s_helm_bin.stat.exists
+  tags:
+    - setup
+
+
+- name: Unpack Helm
+  unarchive:
+    src: "{{ k8s_helm_package_url }}"
+    dest: "{{ _helm_unpack_dir.path }}/"
+    remote_src: yes
+  when:
+    - k8s_node_type == "master"
+    - not _k8s_helm_bin.stat.exists
+  tags:
+    - setup
+
+
+- name: Install Helm
+  copy:
+    remote_src: yes
+    src: "{{ _helm_unpack_dir.path }}/{{ k8s_helm_distribution }}/helm"
+    dest: "{{ k8s_helm_install_dir }}/"
+  when:
+    - k8s_node_type == "master"
+    - not _k8s_helm_bin.stat.exists
+  tags:
+    - setup
+
+
+- name: Setup Helm permissions
+  file:
+    path: "{{ k8s_helm_bin }}"
+    mode: "o+x"
+  when:
+    - k8s_node_type == "master"
+  tags:
+    - setup
+
+
+- name: Remove Helm temporary installation directory
+  file:
+    path: "{{ _helm_unpack_dir.path }}"
+    state: absent
+  when:
+    - k8s_node_type == "master"
+  tags:
+    - setup
+    - remove
+
+
+- name: Uninstall Helm
+  file:
+    path: "{{ k8s_helm_bin }}"
+    state: absent
+  when:
+    - k8s_node_type == "master"
+  tags:
+    - remove
