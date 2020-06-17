@@ -64,15 +64,15 @@
     - setup
 
 
-- name: Remove Helm temporary installation directory
-  file:
-    path: "{{ _helm_unpack_dir.path }}"
-    state: absent
-  when:
-    - k8s_node_type == "master"
-  tags:
-    - setup
-    - remove
+# - name: Remove Helm temporary installation directory
+#   file:
+#     path: "{{ _helm_unpack_dir.path }}"
+#     state: absent
+#   when:
+#     - k8s_node_type == "master"
+#   tags:
+#     - setup
+#     - remove
 
 
 - name: Uninstall Helm
